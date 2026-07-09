@@ -11,6 +11,7 @@ const addHeaderBtn = el('addHeaderBtn');
 const requestBody = el('requestBody');
 const bodyGroup = el('bodyGroup');
 const sendBtn = el('sendBtn');
+const resetBtn = el('resetBtn');
 const responseSection = el('responseSection');
 const statusBadge = el('statusBadge');
 const timeBadge = el('timeBadge');
@@ -50,7 +51,29 @@ function buildUrlPreview() {
 
 requestUrl.addEventListener('input', buildUrlPreview);
 
-function addKvRow(list, key, value, removable) {
+function parseUrlParams() {
+  const raw = requestUrl.value.trim();
+  try {
+    const u = new URL(raw);
+    const params = u.searchParams;
+    if (params.toString()) {
+      paramsList.innerHTML = '';
+      let first = true;
+      for (const [key, value] of params) {
+        addKvRowToList(paramsList, key, value, first);
+        first = false;
+      }
+      requestUrl.value = u.origin + u.pathname;
+      buildUrlPreview();
+    }
+  } catch {
+    // not a valid URL, do nothing
+  }
+}
+
+requestUrl.addEventListener('blur', parseUrlParams);
+
+function addKvRowToList(list, key, value, removable) {
   const row = document.createElement('div');
   row.className = 'kv-row';
 
@@ -91,15 +114,11 @@ function getKvPairs(list) {
   return pairs;
 }
 
-addParamBtn.addEventListener('click', () => addKvRow(paramsList, '', '', true));
-addHeaderBtn.addEventListener('click', () => addKvRow(headersList, '', '', true));
+addParamBtn.addEventListener('click', () => addKvRowToList(paramsList, '', '', true));
+addHeaderBtn.addEventListener('click', () => addKvRowToList(headersList, '', '', true));
 
-function initKvFirstBtn(list) {
-  const rows = list.querySelectorAll('.kv-row');
-  if (rows.length === 1) rows[0].querySelector('.remove-kv').disabled = true;
-}
-initKvFirstBtn(paramsList);
-initKvFirstBtn(headersList);
+addKvRowToList(paramsList, '', '', false);
+addKvRowToList(headersList, 'Content-Type', 'application/json', false);
 
 const s3Fields = el('s3Fields');
 const youdaoFields = el('youdaoFields');
@@ -202,4 +221,32 @@ sendBtn.addEventListener('click', async () => {
     sendBtn.disabled = false;
     sendBtn.textContent = '\u27A4 发送请求';
   }
+});
+
+resetBtn.addEventListener('click', () => {
+  requestUrl.value = '';
+  methodSelect.value = 'GET';
+  updateBodyVisibility();
+
+  paramsList.innerHTML = '';
+  addKvRowToList(paramsList, '', '', false);
+
+  headersList.innerHTML = '';
+  addKvRowToList(headersList, 'Content-Type', 'application/json', false);
+
+  requestBody.value = '';
+  signerSelect.value = '';
+  s3Fields.classList.remove('active');
+  youdaoFields.classList.remove('active');
+  s3AccessKey.value = '';
+  s3SecretKey.value = '';
+  s3Region.value = 'us-east-1';
+  ydAppKey.value = '';
+  ydKey.value = '';
+  ydVocabId.value = '';
+
+  responseSection.style.display = 'none';
+  urlPreview.innerHTML = '&nbsp;';
+  requestUrl.focus();
+  showToast('已重置所有字段');
 });

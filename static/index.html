@@ -38,13 +38,7 @@
 
       <div class="form-group">
         <label>Query Parameters</label>
-        <div class="kv-list" id="paramsList">
-          <div class="kv-row">
-            <input type="text" class="kv-key" placeholder="Key">
-            <input type="text" class="kv-value" placeholder="Value">
-            <button class="btn btn-secondary btn-sm remove-kv" disabled>&minus;</button>
-          </div>
-        </div>
+        <div class="kv-list" id="paramsList"></div>
         <button class="btn btn-secondary btn-sm" id="addParamBtn">+ 添加参数</button>
         <div class="kv-hint">最终 URL</div>
         <div class="url-preview" id="urlPreview">&nbsp;</div>
@@ -101,13 +95,7 @@
 
       <div class="form-group">
         <label>请求头 <span class="label-hint">(可添加多条)</span></label>
-        <div class="kv-list" id="headersList">
-          <div class="kv-row">
-            <input type="text" class="kv-key" placeholder="Key" value="Content-Type">
-            <input type="text" class="kv-value" placeholder="Value" value="application/json">
-            <button class="btn btn-secondary btn-sm remove-kv" disabled>&minus;</button>
-          </div>
-        </div>
+        <div class="kv-list" id="headersList"></div>
         <button class="btn btn-secondary btn-sm" id="addHeaderBtn">+ 添加请求头</button>
       </div>
 
@@ -116,7 +104,10 @@
         <textarea id="requestBody" rows="6" placeholder='{"key": "value"}'></textarea>
       </div>
 
-      <button class="btn btn-primary" id="sendBtn">&#x27A4; 发送请求</button>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="sendBtn">&#x27A4; 发送请求</button>
+        <button class="btn btn-secondary" id="resetBtn">&#x21BB; 重置</button>
+      </div>
 
       <div class="response-section" id="responseSection" style="display:none;">
         <h2>响应</h2>

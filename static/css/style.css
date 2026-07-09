@@ -164,6 +164,9 @@ select { cursor: pointer; }
 .btn-sm { padding: 6px 14px; font-size: 0.85rem; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+.btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.btn-row .btn { flex: 0 0 auto; }
+
 .kv-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
 .kv-row { display: flex; gap: 8px; align-items: center; }
 .kv-row input { flex: 1; }
