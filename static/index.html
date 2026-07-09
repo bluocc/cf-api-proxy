@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CF API 代理请求工具</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="logo">&#x1F6E0;&#xFE0F; CF API Proxy</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>&#x1F4E1; API 代理请求工具</h1>
+      <p>通过 Cloudflare Worker 发送代理请求，支持 AWS S3 SigV4 和有道 v3 签名。</p>
+    </div>
+
+    <div class="tool-card">
+      <div class="form-group">
+        <label for="requestUrl">请求 URL</label>
+        <input type="url" id="requestUrl" placeholder="https://api.example.com/data">
+      </div>
+
+      <div class="form-group">
+        <label for="methodSelect">请求方法</label>
+        <select id="methodSelect">
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="PATCH">PATCH</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Query Parameters</label>
+        <div class="kv-list" id="paramsList">
+          <div class="kv-row">
+            <input type="text" class="kv-key" placeholder="Key">
+            <input type="text" class="kv-value" placeholder="Value">
+            <button class="btn btn-secondary btn-sm remove-kv" disabled>&minus;</button>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="addParamBtn">+ 添加参数</button>
+        <div class="kv-hint">最终 URL</div>
+        <div class="url-preview" id="urlPreview">&nbsp;</div>
+      </div>
+
+      <div class="form-group">
+        <label for="signerSelect">签名模式</label>
+        <select id="signerSelect">
+          <option value="">&#x2716; 无签名</option>
+          <option value="s3-v4">AWS S3 V4</option>
+          <option value="youdao-v3">&#x6709;&#x9053; v3</option>
+        </select>
+      </div>
+
+      <div class="collapse-panel signer-fields" id="s3Fields">
+        <div class="collapse-header" data-target="s3Body">
+          <span class="arrow">&#x25B6;</span> AWS S3 V4 签名设置
+        </div>
+        <div class="collapse-body" id="s3Body">
+          <div class="form-group">
+            <label for="s3AccessKey">Access Key ID</label>
+            <input type="text" id="s3AccessKey" placeholder="AKIAIOSFODNN7EXAMPLE">
+          </div>
+          <div class="form-group">
+            <label for="s3SecretKey">Secret Access Key</label>
+            <input type="password" id="s3SecretKey" placeholder="输入密钥">
+          </div>
+          <div class="form-group">
+            <label for="s3Region">Region</label>
+            <input type="text" id="s3Region" value="us-east-1" placeholder="us-east-1">
+          </div>
+        </div>
+      </div>
+
+      <div class="collapse-panel signer-fields" id="youdaoFields">
+        <div class="collapse-header" data-target="youdaoBody">
+          <span class="arrow">&#x25B6;</span> 有道 v3 签名设置
+        </div>
+        <div class="collapse-body" id="youdaoBody">
+          <div class="form-group">
+            <label for="ydAppKey">appKey</label>
+            <input type="text" id="ydAppKey" placeholder="应用 ID">
+          </div>
+          <div class="form-group">
+            <label for="ydKey">Key (密钥)</label>
+            <input type="password" id="ydKey" placeholder="应用密钥">
+          </div>
+          <div class="form-group">
+            <label for="ydVocabId">vocabId <span class="label-hint">(可选)</span></label>
+            <input type="text" id="ydVocabId" placeholder="用户词表 ID">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>请求头 <span class="label-hint">(可添加多条)</span></label>
+        <div class="kv-list" id="headersList">
+          <div class="kv-row">
+            <input type="text" class="kv-key" placeholder="Key" value="Content-Type">
+            <input type="text" class="kv-value" placeholder="Value" value="application/json">
+            <button class="btn btn-secondary btn-sm remove-kv" disabled>&minus;</button>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="addHeaderBtn">+ 添加请求头</button>
+      </div>
+
+      <div class="form-group" id="bodyGroup">
+        <label for="requestBody">请求体</label>
+        <textarea id="requestBody" rows="6" placeholder='{"key": "value"}'></textarea>
+      </div>
+
+      <button class="btn btn-primary" id="sendBtn">&#x27A4; 发送请求</button>
+
+      <div class="response-section" id="responseSection" style="display:none;">
+        <h2>响应</h2>
+        <div class="response-meta">
+          <span class="badge" id="statusBadge">-</span>
+          <span class="badge badge-info" id="timeBadge">-</span>
+        </div>
+        <div class="response-body" id="responseBody"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>CF API Proxy &mdash; 密钥仅用于本次签名计算，不存储</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
